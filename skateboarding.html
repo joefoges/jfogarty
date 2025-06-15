@@ -7,31 +7,48 @@
     body {
       background-color: maroon;
       color: white;
-      text-align: center;
       font-family: Arial, sans-serif;
       padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    .intro {
+      text-align: left;
+      max-width: 700px;
+      margin: 0 auto 1.5rem auto;
+    }
+    .subpoint {
+      text-indent: 2em;
+      margin-bottom: 1rem;
     }
     video {
       width: 400px;
       height: auto;
-      margin-top: 20px;
+      display: block;
+      margin: 0 auto 1.5rem auto;
+    }
+    .link {
+      text-align: center;
+      margin-top: 2rem;
+    }
+    a {
+      color: #ffcccb;
     }
   </style>
 </head>
 <body>
   <h1>Skateboarding</h1>
-  <div>
-  <p>I recently began going to local skateparks and skatespots.  I plan to post pictures and write about places where I skateboard.</p>
-  </div>
-  <div>
-  <p>I have skateboarded in a parking garage a few times recently while it was raining.  Below is a short video of me skating in a garage</p>
+  <div class="intro">
+    <p>I recently began going to local skateparks and skatespots. I plan to post pictures and write about places where I skateboard.</p>
+    <p class="subpoint">I have skateboarded in a parking garage a few times recently while it was raining. Below is a short video of me skating in a garage:</p>
   </div>
   <video controls>
     <source src="IMG_1672.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-  <div>
-  <p><a href="index.html">Back to home</a></p>
+  <div class="link">
+    <p><a href="index.html">Back to home</a></p>
   </div>
 </body>
 </html>
