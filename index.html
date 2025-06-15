@@ -1,27 +1,91 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Joe Fogarty's Website</title>
-  </head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-      body {
-        background-color: #0077ff; /* Blue background */
-        color: #ffffff; /* White text for contrast */
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 1rem;
-        line-height: 1.6;
-      }
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Joe Fogarty's Website</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0077ff;
+      --primary-dark: #0063d6;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      font-family: 'Montserrat', Arial, sans-serif;
+      color: var(--white);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin: 0.5rem 0;
+    }
+
+    p {
+      margin: 0 0 2rem;
+      font-size: 1.25rem;
+      max-width: 35ch;
+    }
+
+    nav {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    a.button {
+      padding: 0.75rem 1.5rem;
+      background: var(--white);
+      color: var(--primary);
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 700;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    a.button:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    footer {
+      position: fixed;
+      bottom: 0.5rem;
+      width: 100%;
+      text-align: center;
+      font-size: 0.875rem;
+      opacity: 0.7;
+    }
   </style>
-  <body>
-    <h1>This is Joe Fogarty's website</h1>
-    <p>This is my first webpage.</p>
-    <div></div>
-    <a href="https://www.google.com">Go to Google</a>
-    <div></div>
-    <a href="about.html">About Us</a>
-    <div></div>
-    <a href="skateboarding.html">Skateboarding</a>
-  </body>
+</head>
+<body>
+  <main>
+    <h1>Welcome to Joe Fogarty's Website</h1>
+    <p>This is my first webpage—thanks for visiting!</p>
+    <nav>
+      <a href="https://www.google.com" class="button" target="_blank" rel="noopener">Google</a>
+      <a href="about.html" class="button">About Me</a>
+      <a href="skateboarding.html" class="button">Skateboarding</a>
+    </nav>
+  </main>
+  <footer>&copy; <span id="year"></span> Joe Fogarty • All rights reserved.</footer>
+  <script>
+    // Display the current year automatically
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
 </html>
