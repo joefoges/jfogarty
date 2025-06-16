@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pong – Table-Tennis Mini-Game</title>
+
+  <!-- 1️⃣  Defer guarantees the code runs after the DOM is parsed. -->
+  <script defer>
+  "use strict";
+
+  /* ============================================================
+     Basic Pong clone – no external libraries required
+     ============================================================ */
+
+  /* ---------- helpers ---------- */
+  const $ = id => document.getElementById(id);
+
+  /* ---------- run once DOM is ready (defer guarantees this) ---------- */
+  document.addEventListener("DOMContentLoaded", () => {
+
+    const cvs       = $("gameCanvas");
+    const ctx       = cvs.getContext("2d");
+    const WIDTH     = cvs.width;
+    const HEIGHT    = cvs.height;
+
+    /* ---------- constants ---------- */
+    const P_W        = 10;   // paddle width
+    const P_H        = 80;   // paddle height
+    const BALL_R     = 8;
+    const MAX_BSPD   = 12;
+    const START_BSPD = 5;
+
+    /* ---------- state ---------- */
+    let pScore = 0, cScore = 0;
+    $("pScore").textContent = pScore;
+    $("cScore").textContent = cScore;
+
+    const keys = new Set();
+    document.addEventListener("keydown", e => keys.add(e.key.toLowerCase()));
+    document.addEventListener("keyup",   e => keys.delete(e.key.toLowerCase()));
+
+    /* ---------- classes ---------- */
+    class Paddle {
+      constructor(x, player = false) {
+        this.x      = x;
+        this.y      = HEIGHT / 2 - P_H / 2;
+        this.maxVel = 7;
+        this.player = player;
+      }
+      update(ball) {
+        if (this.player) {
+          /* WASD or Arrow keys */
+          if (keys.has("arrowup") || keys.has("w")) this.y -= this.maxVel;
+          if (keys.has("arrowdown") || keys.has("s")) this.y += this.maxVel;
+        } else {
+          /* simple AI: ease toward the ball’s centre */
+          const target = ball.y - P_H / 2;
+          this.y += (target - this.y) * 0.08;     // 0.08 == reaction factor
+        }
+        /* clamp */
+        this.y = Math.max(0, Math.min(HEIGHT - P_H, this.y));
+      }
+      draw() {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(this.x, this.y, P_W, P_H);
+      }
+    }
+
+    class Ball {
+      constructor() { this.reset(Math.random() < 0.5); }
+      reset(towardPlayer) {
+        this.x     = WIDTH  / 2;
+        this.y     = HEIGHT / 2;
+        this.speed = START_BSPD;
+        const angle = (Math.random() * Math.PI / 4 - Math.PI / 8) +
+                      (towardPlayer ? Math.PI : 0);
+        this.vx = this.speed * Math.cos(angle);
+        this.vy = this.speed * Math.sin(angle);
+      }
+      update(p1, p2) {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        /* walls */
+        if (this.y - BALL_R < 0 || this.y + BALL_R > HEIGHT) {
+          this.vy *= -1;
+          this.y  = Math.max(BALL_R, Math.min(HEIGHT - BALL_R, this.y));
+        }
+
+        /* paddles */
+        for (const pad of [p1, p2]) {
+          if (
+            this.x + BALL_R > pad.x &&
+            this.x - BALL_R < pad.x + P_W &&
+            this.y + BALL_R > pad.y &&
+            this.y - BALL_R < pad.y + P_H
+          ) {
+            const rel  = (this.y - (pad.y + P_H / 2)) / (P_H / 2); // -1..1
+            const ang  = rel * Math.PI / 4;                        // ±45°
+            const dir  = pad.player ? 1 : -1;
+            this.speed = Math.min(this.speed + 0.6, MAX_BSPD);
+            this.vx    = dir * this.speed * Math.cos(ang);
+            this.vy    = this.speed * Math.sin(ang);
+            this.x     = pad.player ? pad.x + P_W + BALL_R
+                                    : pad.x - BALL_R;
+          }
+        }
+
+        /* scoring */
+        if (this.x < 0) {
+          $("cScore").textContent = ++cScore;
+          this.reset(true);
+        }
+        if (this.x > WIDTH) {
+          $("pScore").textContent = ++pScore;
+          this.reset(false);
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, BALL_R, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+      }
+    }
+
+    /* ---------- instantiate ---------- */
+    const player = new Paddle(10, true);
+    const cpu    = new Paddle(WIDTH - P_W - 10, false);
+    const ball   = new Ball();
+
+    /* ---------- helpers ---------- */
+    function drawNet() {
+      ctx.fillStyle = "#555";
+      for (let y = 0; y < HEIGHT; y += 30) ctx.fillRect(WIDTH / 2 - 1, y, 2, 20);
+    }
+
+    function loop() {
+      ctx.clearRect(0, 0, WIDTH, HEIGHT);
+      drawNet();
+
+      player.update(ball);
+      cpu.update(ball);
+      ball.update(player, cpu);
+
+      player.draw();
+      cpu.draw();
+      ball.draw();
+
+      requestAnimationFrame(loop);
+    }
+
+    /* ---------- UI ---------- */
+    $("reset").onclick = () => {
+      pScore = cScore = 0;
+      $("pScore").textContent = $("cScore").textContent = 0;
+      ball.reset(Math.random() < 0.5);
+    };
+
+    /* kick off */
+    loop();
+  });
+  </script>
+
+  <style>
+    /* --- layout & look --------------------------------------------- */
+    html, body { height: 100%; margin: 0; }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #111;
+      color: #fff;
+      font-family: system-ui, sans-serif;
+    }
+    #gameCanvas { background: #000; border: 2px solid #fff; }
+    #ui {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      user-select: none;
+    }
+    #ui button {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 2️⃣  Canvas before any rendering happens -->
+  <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+  <!-- 3️⃣  Simple UI overlay -->
+  <div id="ui">
+    <button id="reset">Restart</button>
+    <p>Move with <strong>W / S</strong> or <strong>↑ / ↓</strong></p>
+    <p>Score <span id="pScore">0</span> – <span id="cScore">0</span></p>
+  </div>
+
+</body>
+</html>
